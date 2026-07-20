@@ -9,8 +9,20 @@ from launch_ros.actions import Node
 
 
 def generate_launch_description():
+    # gz-sim resolves the URDF's `package://robot_description/meshes/...` mesh
+    # URIs as `model://robot_description/meshes/...`, which it looks up relative
+    # to GZ_SIM_RESOURCE_PATH. Add the share-directory parent of
+    # robot_description (i.e. .../share) so "robot_description/meshes/..."
+    # resolves under .../share/robot_description/meshes/....
+    robot_description_share = get_package_share_directory('robot_description')
+    resource_path_parent = os.path.dirname(robot_description_share)
+    existing_resource_path = os.environ.get('GZ_SIM_RESOURCE_PATH', '')
+    os.environ['GZ_SIM_RESOURCE_PATH'] = os.pathsep.join(
+        p for p in [resource_path_parent, existing_resource_path] if p
+    )
+
     robot_description_path = PathJoinSubstitution([
-        get_package_share_directory('robot_description'),
+        robot_description_share,
         'robot', 'cart_pole.urdf.xacro',
     ])
     robot_description = Command(['xacro ', robot_description_path])
@@ -58,13 +70,17 @@ def generate_launch_description():
         arguments=[
             '/model/cart_pole/joint/cart_joint/cmd_force'
             '@std_msgs/msg/Float64]gz.msgs.Double',
-            '/model/cart_pole/joint_state'
+            # gz-sim nests JointStatePublisher's topic under the world name
+            # for a model spawned into a running world (confirmed via
+            # `gz topic -l` / `gz topic -i` at runtime), unlike the plain
+            # `/model/<model>/...` form documented for ApplyJointForce.
+            '/world/robomaster_rale/model/cart_pole/joint_state'
             '@sensor_msgs/msg/JointState[gz.msgs.Model',
             '/world/robomaster_rale/control@ros_gz_interfaces/srv/ControlWorld',
         ],
         remappings=[
             ('/model/cart_pole/joint/cart_joint/cmd_force', '/cart_controller/command'),
-            ('/model/cart_pole/joint_state', '/joint_states'),
+            ('/world/robomaster_rale/model/cart_pole/joint_state', '/joint_states'),
         ],
         output='screen',
     )

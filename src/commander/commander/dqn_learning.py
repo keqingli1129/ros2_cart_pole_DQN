@@ -130,7 +130,14 @@ class DQNSimulationNode(Node):
         if not self.reset_client.wait_for_service(timeout_sec=5.0):
             raise RuntimeError('/world/robomaster_rale/control service unavailable')
         request = ControlWorld.Request()
-        request.world_control.reset.all = True
+        # NOTE: reset.all=True tears down and recreates every entity in the
+        # world (confirmed via live testing: gz-sim's JointStatePublisher
+        # stops advertising its gz-transport topic permanently after an
+        # `all` reset, silently freezing /joint_states forever after episode
+        # 0). reset.model_only=True resets model poses/velocities without
+        # that teardown, so JointStatePublisher keeps publishing across
+        # every episode.
+        request.world_control.reset.model_only = True
         future = self.reset_client.call_async(request)
         while not future.done():
             time.sleep(0.001)

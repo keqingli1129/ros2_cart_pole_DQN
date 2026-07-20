@@ -9,5 +9,7 @@ def generate_launch_description():
             executable='dqn_learning',
             name='commander_node',
             output='screen',
+            emulate_tty=True,
+            additional_env={'PYTHONUNBUFFERED': '1'},
         ),
     ])
