@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dpkg -L ros-jazzy-gz-ros2-control)",
+      "Bash(grep -i -E \"\\\\.xacro$|\\\\.urdf$|example\")",
+      "Read(//opt/ros/jazzy/**)",
+      "Bash(apt list *)",
+      "Bash(git init *)",
+      "Bash(git add *)",
+      "Bash(git commit *)"
+    ]
+  }
+}
