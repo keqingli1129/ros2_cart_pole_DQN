@@ -40,7 +40,8 @@
       "Bash(ros2 daemon *)",
       "Bash(git checkout *)",
       "Bash(git merge ros2-port --no-ff -m ' *)",
-      "Bash(git branch *)"
+      "Bash(git branch *)",
+      "Bash(git config *)"
     ]
   }
 }
