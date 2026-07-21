@@ -139,7 +139,12 @@ class DQNSimulationNode(Node):
         # every episode.
         request.world_control.reset.model_only = True
         future = self.reset_client.call_async(request)
+        deadline = time.time() + 5.0
         while not future.done():
+            if time.time() > deadline:
+                raise RuntimeError(
+                    'reset_simulation: /world/robomaster_rale/control did not '
+                    'respond within 5.0s')
             time.sleep(0.001)
 
     def simulate(self, episode, is_training, agent):
