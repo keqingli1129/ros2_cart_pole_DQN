@@ -35,9 +35,12 @@
   <!-- =============== Transmissions =============== -->
   <xacro:cart_trans_v0/>
 
-  <!-- =============== Gazebo =============== -->
+  <!-- =============== Gazebo (gz-sim) =============== -->
   <gazebo>
-    <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so"/>
+    <plugin filename="gz-sim-apply-joint-force-system" name="gz::sim::systems::ApplyJointForce">
+      <joint_name>cart_joint</joint_name>
+    </plugin>
+    <plugin filename="gz-sim-joint-state-publisher-system" name="gz::sim::systems::JointStatePublisher"/>
   </gazebo>
 
   <xacro:base_gazebo_v0/>

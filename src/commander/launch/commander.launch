@@ -1,3 +1,0 @@
-<launch>
-  <node pkg="commander" name="commander_node" type="DQN_learning.py" output="screen"/>
-</launch>
