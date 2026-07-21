@@ -2,7 +2,8 @@ import os
 
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import IncludeLaunchDescription
+from launch.actions import IncludeLaunchDescription, RegisterEventHandler
+from launch.event_handlers import OnProcessExit
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import Command, PathJoinSubstitution
 from launch_ros.actions import Node
@@ -93,11 +94,18 @@ def generate_launch_description():
         parameters=[{'robot_description': robot_description}],
     )
 
+    start_commander_after_spawn = RegisterEventHandler(
+        event_handler=OnProcessExit(
+            target_action=spawn_entity,
+            on_exit=[commander],
+        )
+    )
+
     return LaunchDescription([
         gz_sim,
         robot_state_publisher_source,
         bridge,
         spawn_entity,
         robot_control,
-        commander,
+        start_commander_after_spawn,
     ])
